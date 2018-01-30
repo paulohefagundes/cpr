@@ -380,7 +380,12 @@ Response Session::Impl::makeRequest(CURL* curl) {
 
     auto protocol = url_.substr(0, url_.find(':'));
     if (proxies_.has(protocol)) {
-        curl_easy_setopt(curl, CURLOPT_PROXY, proxies_[protocol].data());
+        curl_easy_setopt(curl, CURLOPT_PROXY, std::get<0>(proxies_[protocol]).data());
+        if (!std::get<1>(proxies_[protocol]).empty()) {
+            curl_easy_setopt(curl, CURLOPT_PROXYAUTH, CURLAUTH_ANY);
+            curl_easy_setopt(curl, CURLOPT_PROXYUSERPWD, std::get<1>(proxies_[protocol]).data());
+        }
+
     } else {
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
     }
