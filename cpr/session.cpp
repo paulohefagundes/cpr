@@ -381,6 +381,11 @@ Response Session::Impl::makeRequest(CURL* curl) {
     auto protocol = url_.substr(0, url_.find(':'));
     if (proxies_.has(protocol)) {
         curl_easy_setopt(curl, CURLOPT_PROXY, proxies_[protocol].data());
+        if (proxies_.has("authentication") && (!proxies_["authentication"].empty())) {
+            curl_easy_setopt(curl, CURLOPT_PROXYAUTH, CURLAUTH_ANY);
+            curl_easy_setopt(curl, CURLOPT_PROXYUSERPWD, proxies_["authentication"].data());
+        }
+
     } else {
         curl_easy_setopt(curl, CURLOPT_PROXY, "");
     }
